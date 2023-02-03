@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
 const productCol = require("./db/schema");
 const { printPdf } = require("./helpers/converter");
 const { ProductsData } = require("./helpers/ProductsData");
@@ -23,15 +24,27 @@ app.get("/api/products", async (req, res) => {
 app.post("/api/products", async (req, res) => {
     try {
         let data = req.body;
+        console.log("data " + data);
         if (data.length === 0) res.sendStatus(400);
         else {
             let parameter = await ProductsData(data);
-            printPdf(parameter, () =>
-                res.sendFile(path.join(__dirname, "invoice.pdf"))
-            );
+            printPdf(parameter, () => {
+                const pathes = { pdf: path.join(__dirname, "invoice.pdf") };
+                var file = fs.createReadStream(pathes.pdf);
+                var stat = fs.statSync(pathes.pdf);
+                res.setHeader("Content-Length", stat.size);
+                res.setHeader("Content-Type", "application/pdf");
+                res.setHeader(
+                    "Content-Disposition",
+                    "inline; filename=invoice.pdf"
+                );
+                res.status(200);
+                file.pipe(res);
+            });
         }
     } catch (err) {
-        res.status(400).send(err);
+        console.log(err);
+        res.status(405).send(err);
     }
 });
 

@@ -38,6 +38,6 @@ module.exports.ProductsData = async (data) => {
         parameter.subTotal += product.amount;
         parameter.total += product.cgst + product.sgst + product.amount;
         parameter.totalWords = word.toWords(parameter.total) + " only";
-    }
+    } 
     return parameter;
 };
