@@ -14,7 +14,7 @@ export default function Invoice(props) {
                 },
                 body: JSON.stringify(cart),
             });
-            if (res.status === 200) {
+            if (res.status === 200 || res.status === 204) {
                 res.blob().then((blob) =>
                     FileSaver.saveAs(blob, "invoice.pdf")
                 );
